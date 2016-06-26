@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flf.mapper.AccidentMapper">
+    <sql id="accidentColumns">id,time,province,city,category_big,category_small,material,reason_type,result_type,accident_des,accident_reason,accident_reason_des,casualties,outages,other_results,loss_des,information_sources,image_url,note</sql>
+	<resultMap type="Accident" id="accidentResultMap">
+		<id column="id" property="id"/>
+		<result column="time" property="time"/>
+		<result column="province" property="province"/>
+		<result column="city" property="city"/>
+		<result column="category_big" property="category_big"/>
+		<result column="category_small" property="category_small"/>
+		<result column="material" property="material"/>
+		<result column="reason_type" property="reason_type"/>
+		<result column="result_type" property="result_type"/>
+		<result column="accident_des" property="accident_des"/>
+		<result column="accident_reason" property="accident_reason"/>
+		<result column="accident_reason_des" property="accident_reason_des"/>
+		<result column="casualties" property="casualties"/>
+		<result column="outages" property="outages"/>
+		<result column="other_results" property="other_results"/>
+		<result column="loss_des" property="loss_des"/>
+		<result column="information_sources" property="information_sources"/>
+		<result column="image_url" property="image_url"/>
+		<result column="note" property="note"/>
+	</resultMap>
+	<resultMap type="Yyqj" id="yyqjMap">
+	    <result column="name" property="name"/>
+	    <result column="size" property="size"/>
+	</resultMap>
+	
+	<select id="listPagePage" parameterType="Page" resultMap="accidentResultMap">
+		select * from tb_accident where 1=1
+		<if test="city!=null and city!=''">
+		   and city = #{city}
+		</if>
+		<if test="category_big!=null and category_big!=''">
+	      and category_big=#{category_big}
+	    </if>
+	    <if test="accidentStart!=null and accidentStart!=''">
+	      and time&gt;=#{accidentStart}
+	    </if>
+	    <if test="accidentEnd!=null and accidentEnd!=''">
+	      and time&lt;=#{accidentEnd}
+	    </if>
+	</select>
+	<select id="listPageAccident" parameterType="Accident" resultMap="accidentResultMap">
+		select * from tb_accident where 1=1
+		<if test="city!=null and city!=''">
+		   and city = #{city}
+		</if>
+		<if test="category_big!=null and category_big!=''">
+	      and category_big=#{category_big}
+	    </if>
+	    <if test="accidentStart!=null and accidentStart!=''">
+	      and time&gt;=#{accidentStart}
+	    </if>
+	    <if test="accidentEnd!=null and accidentEnd!=''">
+	      and time&lt;=#{accidentEnd}
+	    </if>
+	</select>
+	<select id="getAccidentById" parameterType="String" resultMap="accidentResultMap">
+		select * from tb_accident where id = #{id}
+	</select>
+	<select id="getCategory" resultType="String">
+	   select distinct(category_big) from tb_accident;
+	</select>
+	<select id="getSizeByCategory" parameterType="String" resultMap="yyqjMap">
+	   select ${_parameter} name,count(id) size from tb_accident GROUP BY ${_parameter};
+	</select>
+	<update id="updateAccident" parameterType="Accident">
+	    update tb_accident set id=#{id}
+	    <if test="time!=null and time!=''">
+	      ,time=#{time}
+	    </if>
+	    <if test="province!=null and province!=''">
+	      ,province=#{province}
+	    </if>
+	    <if test="city!=null and city!=''">
+	      ,city=#{city}
+	    </if>
+	    <if test="category_big!=null and category_big!=''">
+	      ,category_big=#{category_big}
+	    </if>
+	    <if test="category_small!=null and category_small!=''">
+	      ,category_small=#{category_small}
+	    </if>
+	    <if test="material!=null and material!=''">
+	      ,material=#{material}
+	    </if>
+	    <if test="reason_type!=null and reason_type!=''">
+	      ,reason_type=#{reason_type}
+	    </if>
+	    <if test="result_type!=null and result_type!=''">
+	      ,result_type=#{result_type}
+	    </if>
+	    <if test="accident_des!=null and accident_des!=''">
+	      ,accident_des=#{accident_des}
+	    </if>
+	    <if test="accident_reason!=null and accident_reason!=''">
+	      ,accident_reason=#{accident_reason}
+	    </if>
+	    <if test="accident_reason_des!=null and accident_reason_des!=''">
+	      ,accident_reason_des=#{accident_reason_des}
+	    </if>
+	    <if test="casualties!=null and casualties!=''">
+	      ,casualties=#{casualties}
+	    </if>
+	    <if test="outages!=null and outages!=''">
+	      ,outages=#{outages}
+	    </if>
+	    <if test="other_results!=null and other_results!=''">
+	      ,other_results=#{other_results}
+	    </if>
+	    <if test="loss_des!=null and loss_des!=''">
+	      ,loss_des=#{loss_des}
+	    </if>
+	    <if test="information_sources!=null and information_sources!=''">
+	      ,information_sources=#{information_sources}
+	    </if>
+	    <if test="image_url!=null and image_url!=''">
+	      ,image_url=#{image_url}
+	    </if>
+	    <if test="note!=null and note!=''">
+	      ,note=#{note}
+	    </if>
+	    where id=#{id}
+	</update>
+	<insert id="insertAccident" parameterType="Accident" useGeneratedKeys="false" keyProperty="id">
+		insert tb_accident (<include refid="accidentColumns"/>) values (#{id},#{time},#{province},#{city},#{category_big},#{category_small},#{material},#{reason_type},#{result_type},#{accident_des},#{accident_reason},#{accident_reason_des},#{casualties},#{outages},#{other_results},#{loss_des},#{information_sources},#{image_url},#{note})
+	</insert>
+	
+	<insert id="insertBatchAccident" parameterType="ArrayList">
+		insert tb_accident (<include refid="accidentColumns"/>) values 
+		<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.id},#{item.time},#{item.province},#{item.city},#{item.category_big},#{item.category_small},#{item.material},#{item.reason_type},#{item.result_type},#{item.accident_des},#{item.accident_reason},#{item.accident_reason_des},#{item.casualties},#{item.outages},#{item.other_results},#{item.loss_des},#{item.information_sources},#{item.image_url},#{item.note})
+		</foreach>
+	</insert>
+</mapper>
